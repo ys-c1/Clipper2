@@ -884,6 +884,304 @@ namespace Clipper2Lib
     return Area<T>(poly) >= 0;
   }
 
+  // --------------------------------------------------------------------------
+  // Path statistics, self-intersection detection and area conservation checks.
+  // These are read-only helpers: no clipping is performed.
+  // --------------------------------------------------------------------------
+
+  struct PathStats
+  {
+    size_t path_count = 0;    // number of paths included in the statistics
+    size_t vertex_count = 0;  // total number of vertices
+    double area = 0.0;        // signed area (sum over all paths)
+    double abs_area = 0.0;    // sum of the absolute area of each path
+    double perimeter = 0.0;   // total perimeter of all paths
+    bool is_positive = true;  // signed area >= 0
+  };
+
+  struct AreaCheckResult
+  {
+    double expected_area = 0.0;
+    double actual_area = 0.0;
+    double abs_error = 0.0;
+    double rel_error = 0.0;
+    double tolerance = 0.0;
+    bool passed = false;
+  };
+
+  template <typename T>
+  inline double Perimeter(const Path<T>& path, bool is_closed_path = true)
+  {
+    const size_t cnt = path.size();
+    if (cnt < 2) return 0.0;
+    double result = 0.0;
+    for (size_t i = 1; i < cnt; ++i)
+      result += std::sqrt(Sqr(path[i].x - path[i - 1].x) +
+        Sqr(path[i].y - path[i - 1].y));
+    if (is_closed_path)
+      result += std::sqrt(Sqr(path[0].x - path[cnt - 1].x) +
+        Sqr(path[0].y - path[cnt - 1].y));
+    return result;
+  }
+
+  template <typename T>
+  inline double Perimeter(const Paths<T>& paths, bool is_closed_path = true)
+  {
+    double result = 0.0;
+    for (const Path<T>& path : paths)
+      result += Perimeter(path, is_closed_path);
+    return result;
+  }
+
+  template <typename T>
+  inline size_t VertexCount(const Path<T>& path)
+  {
+    return path.size();
+  }
+
+  template <typename T>
+  inline size_t VertexCount(const Paths<T>& paths)
+  {
+    size_t result = 0;
+    for (const Path<T>& path : paths) result += path.size();
+    return result;
+  }
+
+  template <typename T>
+  inline PathStats GetPathStats(const Path<T>& path,
+    bool is_closed_path = true)
+  {
+    PathStats result;
+    result.path_count = 1;
+    result.vertex_count = path.size();
+    result.area = Area(path);
+    result.abs_area = std::fabs(result.area);
+    result.perimeter = Perimeter(path, is_closed_path);
+    result.is_positive = result.area >= 0.0;
+    return result;
+  }
+
+  template <typename T>
+  inline PathStats GetPathStats(const Paths<T>& paths,
+    bool is_closed_path = true)
+  {
+    PathStats result;
+    result.path_count = paths.size();
+    result.area = Area(paths);
+    for (const Path<T>& path : paths)
+    {
+      result.vertex_count += path.size();
+      result.abs_area += std::fabs(Area(path));
+      result.perimeter += Perimeter(path, is_closed_path);
+    }
+    result.is_positive = result.area >= 0.0;
+    return result;
+  }
+
+  namespace detail
+  {
+    // Unlike CrossProductSign (which truncates non-integral arguments to
+    // 128 bit integers), OrientSign also handles floating point points.
+    template <typename T>
+    inline int OrientSign(const Point<T>& pt1,
+      const Point<T>& pt2, const Point<T>& pt3)
+    {
+      if constexpr (std::is_integral_v<T>)
+        return CrossProductSign(pt1, pt2, pt3);
+      else
+      {
+        const T ab = (pt2.x - pt1.x) * (pt3.y - pt2.y);
+        const T cd = (pt2.y - pt1.y) * (pt3.x - pt2.x);
+        return (ab > cd) ? 1 : ((ab < cd) ? -1 : 0);
+      }
+    }
+
+    template <typename T>
+    inline bool PointInBoundingBox(const Point<T>& pt,
+      const Point<T>& pt1, const Point<T>& pt2)
+    {
+      return pt.x >= (std::min)(pt1.x, pt2.x) &&
+        pt.x <= (std::max)(pt1.x, pt2.x) &&
+        pt.y >= (std::min)(pt1.y, pt2.y) &&
+        pt.y <= (std::max)(pt1.y, pt2.y);
+    }
+
+    // Returns true when the closed segments a-b and c-d share at least
+    // one point (crossings, endpoint touches and collinear overlaps).
+    template <typename T>
+    inline bool SegmentsTouch(const Point<T>& a, const Point<T>& b,
+      const Point<T>& c, const Point<T>& d)
+    {
+      const int o1 = OrientSign(a, b, c);
+      const int o2 = OrientSign(a, b, d);
+      const int o3 = OrientSign(c, d, a);
+      const int o4 = OrientSign(c, d, b);
+      if (o1 != o2 && o3 != o4) return true;
+      if (o1 == 0 && PointInBoundingBox(c, a, b)) return true;
+      if (o2 == 0 && PointInBoundingBox(d, a, b)) return true;
+      if (o3 == 0 && PointInBoundingBox(a, c, d)) return true;
+      if (o4 == 0 && PointInBoundingBox(b, c, d)) return true;
+      return false;
+    }
+
+    // Consecutive edges (pt1, shared) and (shared, pt2) should only meet
+    // at 'shared'. They also self-overlap when they collinearly double
+    // back over each other (eg a spike: A -> B -> A).
+    template <typename T>
+    inline bool AdjacentEdgesOverlap(const Point<T>& pt1,
+      const Point<T>& shared, const Point<T>& pt2)
+    {
+      if (OrientSign(pt1, shared, pt2) != 0) return false;
+      const double dx1 = static_cast<double>(pt1.x) - shared.x;
+      const double dy1 = static_cast<double>(pt1.y) - shared.y;
+      const double dx2 = static_cast<double>(pt2.x) - shared.x;
+      const double dy2 = static_cast<double>(pt2.y) - shared.y;
+      return (dx1 * dx2 + dy1 * dy2) > 0.0;
+    }
+  } // namespace detail
+
+  // Counts pairs of edges in a closed path that overlap or cross. Edges that
+  // merely share a vertex with their immediate neighbour are not counted,
+  // but adjacent edges that retrace each other are. Zero length edges are
+  // ignored (so paths that repeat their first point at the end are fine).
+  // Intersections between different paths are not considered.
+  template <typename T>
+  inline size_t CountSelfIntersections(const Path<T>& path)
+  {
+    // Drop repeated consecutive vertices, and a repeated final vertex, so
+    // that "adjacent" edges really are edge i and edge i+1 (cyclically).
+    Path<T> pts;
+    pts.reserve(path.size());
+    for (const Point<T>& pt : path)
+      if (pts.empty() || pts.back() != pt) pts.push_back(pt);
+    if (pts.size() > 1 && pts.front() == pts.back()) pts.pop_back();
+
+    const size_t n = pts.size();
+    if (n < 3) return 0;
+
+    struct Edge
+    {
+      size_t i0, i1;
+      T minx, maxx, miny, maxy;
+    };
+
+    std::vector<Edge> edges;
+    edges.reserve(n);
+    for (size_t i = 0; i < n; ++i)
+    {
+      const size_t j = (i + 1 == n) ? 0 : i + 1;
+      const Point<T>& a = pts[i];
+      const Point<T>& b = pts[j];
+      edges.push_back(Edge{ i, j,
+        (std::min)(a.x, b.x), (std::max)(a.x, b.x),
+        (std::min)(a.y, b.y), (std::max)(a.y, b.y) });
+    }
+
+    std::sort(edges.begin(), edges.end(),
+      [](const Edge& a, const Edge& b)
+      {
+        if (a.minx != b.minx) return a.minx < b.minx;
+        return a.maxx < b.maxx;
+      });
+
+    // Sweep a vertical line left to right, keeping an "active" set of edges
+    // whose x extent is still open. With the edge list sorted by its left
+    // x coordinate, each edge is only compared against still-active edges
+    // whose left x is <= its own, so each pair is tested exactly once.
+    size_t count = 0;
+    std::vector<size_t> active;    // indices into edges
+    std::vector<size_t> survivors;
+
+    const auto test_pair = [&](size_t prev_idx, size_t cur_idx)
+    {
+      const Edge& prev = edges[prev_idx];
+      const Edge& cur = edges[cur_idx];
+      if (prev.maxy < cur.miny || prev.miny > cur.maxy) return;
+
+      size_t shared = n; // n is not a valid vertex index
+      if (prev.i0 == cur.i0 || prev.i0 == cur.i1) shared = prev.i0;
+      else if (prev.i1 == cur.i0 || prev.i1 == cur.i1) shared = prev.i1;
+
+      if (shared == n)
+      {
+        if (detail::SegmentsTouch(pts[cur.i0], pts[cur.i1],
+          pts[prev.i0], pts[prev.i1])) ++count;
+      }
+      else
+      {
+        const size_t cur_other = (cur.i0 == shared) ? cur.i1 : cur.i0;
+        const size_t prev_other = (prev.i0 == shared) ? prev.i1 : prev.i0;
+        if (detail::AdjacentEdgesOverlap(pts[prev_other],
+          pts[shared], pts[cur_other])) ++count;
+      }
+    };
+
+    for (size_t e = 0; e < edges.size(); ++e)
+    {
+      // retire edges that end before this one begins
+      const T x = edges[e].minx;
+      survivors.clear();
+      for (const size_t idx : active)
+        if (edges[idx].maxx >= x) survivors.push_back(idx);
+      active.swap(survivors);
+
+      for (const size_t idx : active)
+        test_pair(idx, e);
+
+      active.push_back(e);
+    }
+    return count;
+  }
+
+  template <typename T>
+  inline size_t CountSelfIntersections(const Paths<T>& paths)
+  {
+    size_t count = 0;
+    for (const Path<T>& path : paths)
+      count += CountSelfIntersections(path);
+    return count;
+  }
+
+  template <typename T>
+  inline bool IsSelfIntersecting(const Path<T>& path)
+  {
+    return CountSelfIntersections(path) > 0;
+  }
+
+  template <typename T>
+  inline bool IsSelfIntersecting(const Paths<T>& paths)
+  {
+    return CountSelfIntersections(paths) > 0;
+  }
+
+  // Compares the (signed) area of 'output' against 'expected_area'.
+  // 'tolerance' is an absolute area, so it's passed if
+  // abs(actual - expected) <= tolerance.
+  template <typename T>
+  inline AreaCheckResult CheckAreaConservation(double expected_area,
+    const Paths<T>& output, double tolerance)
+  {
+    AreaCheckResult result;
+    result.expected_area = expected_area;
+    result.actual_area = Area(output);
+    result.tolerance = tolerance;
+    result.abs_error =
+      std::fabs(result.actual_area - result.expected_area);
+    const double denom = std::fabs(result.expected_area);
+    result.rel_error =
+      (denom > 0.0) ? result.abs_error / denom : result.abs_error;
+    result.passed = result.abs_error <= tolerance;
+    return result;
+  }
+
+  // Compares the area of 'output' against the area of 'input'.
+  template <typename T>
+  inline AreaCheckResult CheckAreaConservation(const Paths<T>& input,
+    const Paths<T>& output, double tolerance)
+  {
+    return CheckAreaConservation(Area(input), output, tolerance);
+  }
+
   // GetLineIntersectPt - a 'true' result is non-parallel. The 'ip' will also
   // be constrained to seg1. However, it's possible that 'ip' won't be inside
   // seg2, even when 'ip' hasn't been constrained (ie 'ip' is inside seg1).
