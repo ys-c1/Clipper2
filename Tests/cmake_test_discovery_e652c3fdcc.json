@@ -1,0 +1,278 @@
+{
+  "tests": 52,
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "BatchBoolean",
+      "tests": 4,
+      "testsuite": [
+        {
+          "name": "MatchesSequentialPerGroup",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestBatch.cpp",
+          "line": 108
+        },
+        {
+          "name": "ParallelHashMatchesSerial",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestBatch.cpp",
+          "line": 121
+        },
+        {
+          "name": "Performance10kSmallPolygons",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestBatch.cpp",
+          "line": 147
+        },
+        {
+          "name": "EmptyGroups",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestBatch.cpp",
+          "line": 163
+        }
+      ]
+    },
+    {
+      "name": "Clipper2Tests",
+      "tests": 48,
+      "testsuite": [
+        {
+          "name": "ExportHeader64",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestExportHeaders.cpp",
+          "line": 74
+        },
+        {
+          "name": "ExportHeaderD",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestExportHeaders.cpp",
+          "line": 102
+        },
+        {
+          "name": "ExportHeaderTree64",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestExportHeaders.cpp",
+          "line": 130
+        },
+        {
+          "name": "ExportHeaderTreeD",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestExportHeaders.cpp",
+          "line": 167
+        },
+        {
+          "name": "TesthiCalculation",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestIsCollinear.cpp",
+          "line": 4
+        },
+        {
+          "name": "TestIsCollinear",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestIsCollinear.cpp",
+          "line": 28
+        },
+        {
+          "name": "TestIsCollinear2",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestIsCollinear.cpp",
+          "line": 39
+        },
+        {
+          "name": "TestMultipleLines",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestLines.cpp",
+          "line": 4
+        },
+        {
+          "name": "TestOffsets",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 7
+        },
+        {
+          "name": "TestOffsets2",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 44
+        },
+        {
+          "name": "TestOffsets3",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 74
+        },
+        {
+          "name": "TestOffsets4",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 100
+        },
+        {
+          "name": "TestOffsets5",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 128
+        },
+        {
+          "name": "TestOffsets6",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 356
+        },
+        {
+          "name": "TestOffsets7",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 379
+        },
+        {
+          "name": "TestOffsets8",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 475
+        },
+        {
+          "name": "TestOffsets9",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 581
+        },
+        {
+          "name": "TestOffsets10",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 618
+        },
+        {
+          "name": "TestOffsets11",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 661
+        },
+        {
+          "name": "TestOffsets12",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 670
+        },
+        {
+          "name": "TestOffsets13",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsets.cpp",
+          "line": 679
+        },
+        {
+          "name": "TestOffsettingOrientation1",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsetOrientation.cpp",
+          "line": 4
+        },
+        {
+          "name": "TestOffsettingOrientation2",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOffsetOrientation.cpp",
+          "line": 12
+        },
+        {
+          "name": "TestNegativeOrientation",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestOrientation.cpp",
+          "line": 4
+        },
+        {
+          "name": "TestMultiplePolygons",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolygons.cpp",
+          "line": 20
+        },
+        {
+          "name": "TestHorzSpikes",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolygons.cpp",
+          "line": 100
+        },
+        {
+          "name": "TestCollinearOnMacOs",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolygons.cpp",
+          "line": 112
+        },
+        {
+          "name": "TestPolytreeHoles1",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 5
+        },
+        {
+          "name": "TestPolytreeHoles2",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 62
+        },
+        {
+          "name": "TestPolytreeHoles3",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 133
+        },
+        {
+          "name": "TestPolytreeHoles4",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 151
+        },
+        {
+          "name": "TestPolytreeHoles5",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 172
+        },
+        {
+          "name": "TestPolytreeHoles6",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 190
+        },
+        {
+          "name": "TestPolytreeHoles7",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 213
+        },
+        {
+          "name": "TestPolytreeHoles8",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 227
+        },
+        {
+          "name": "TestPolytreeHoles9",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 261
+        },
+        {
+          "name": "TestPolytreeHoles10",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeHoles.cpp",
+          "line": 297
+        },
+        {
+          "name": "TestPolyTreeIntersection",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeIntersection.cpp",
+          "line": 4
+        },
+        {
+          "name": "TestPolytreeUnion",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeUnion.cpp",
+          "line": 6
+        },
+        {
+          "name": "TestPolytreeUnion2",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeUnion.cpp",
+          "line": 30
+        },
+        {
+          "name": "TestPolytreeUnion3",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestPolytreeUnion.cpp",
+          "line": 53
+        },
+        {
+          "name": "TestRandomPaths",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestRandomPaths.cpp",
+          "line": 42
+        },
+        {
+          "name": "TestRectClip",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestRectClip.cpp",
+          "line": 4
+        },
+        {
+          "name": "TestRectClip2",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestRectClip.cpp",
+          "line": 48
+        },
+        {
+          "name": "TestRectClip3",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestRectClip.cpp",
+          "line": 56
+        },
+        {
+          "name": "TestRectClipOrientation",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestRectClip.cpp",
+          "line": 68
+        },
+        {
+          "name": "TestSimplifyPath",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestSimplifyPath.cpp",
+          "line": 4
+        },
+        {
+          "name": "TestTrimCollinear",
+          "file": "\/home\/ys\/feedback\/uidreczz28bCNW6Yx4b\/CPP\/Tests\/TestTrimCollinear.cpp",
+          "line": 4
+        }
+      ]
+    }
+  ]
+}

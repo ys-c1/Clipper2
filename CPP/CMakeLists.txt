@@ -42,6 +42,7 @@ configure_file(clipper.version.in
 set(CLIPPER2_INC
   ${CLIPPER2_INC_FOLDER}/clipper.h
   ${CLIPPER2_INC_FOLDER}/clipper.version.h
+  ${CLIPPER2_INC_FOLDER}/clipper.batch.h
   ${CLIPPER2_INC_FOLDER}/clipper.core.h
   ${CLIPPER2_INC_FOLDER}/clipper.engine.h
   ${CLIPPER2_INC_FOLDER}/clipper.export.h
@@ -239,6 +240,7 @@ endif()
 if(CLIPPER2_TESTS)
   # See: https://cliutils.gitlab.io/modern-cmake/chapters/testing/googletest.html
   enable_testing()
+  find_package(Threads REQUIRED)
   if (WIN32)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   endif()
@@ -265,6 +267,7 @@ if(CLIPPER2_TESTS)
   endif()
 
   set(ClipperTests_SRC
+    Tests/TestBatch.cpp
     Tests/TestExportHeaders.cpp
     Tests/TestIsCollinear.cpp
     Tests/TestLines.cpp
@@ -287,7 +290,7 @@ if(CLIPPER2_TESTS)
   if (NOT (CLIPPER2_USINGZ STREQUAL "ONLY"))
     list(APPEND CLIPPER2_TESTS "ClipperTests")
     add_executable(ClipperTests ${ClipperTests_SRC})
-    target_link_libraries(ClipperTests ${gtest_libs} Clipper2 Clipper2utils)
+    target_link_libraries(ClipperTests ${gtest_libs} Clipper2 Clipper2utils Threads::Threads)
 
     gtest_discover_tests(ClipperTests
       # set a working directory to your project root so that you can find test data via paths relative to the project root
@@ -299,7 +302,7 @@ if(CLIPPER2_TESTS)
   if (NOT (CLIPPER2_USINGZ STREQUAL "OFF"))
     list(APPEND CLIPPER2_TESTS "ClipperTestsZ")
     add_executable(ClipperTestsZ ${ClipperTests_SRC})
-    target_link_libraries(ClipperTestsZ ${gtest_libs} Clipper2Z Clipper2Zutils)
+    target_link_libraries(ClipperTestsZ ${gtest_libs} Clipper2Z Clipper2Zutils Threads::Threads)
 
     gtest_discover_tests(ClipperTestsZ
       # set a working directory so your project root so that you can find test data via paths relative to the project root
