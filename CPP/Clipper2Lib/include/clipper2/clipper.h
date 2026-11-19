@@ -713,6 +713,85 @@ namespace Clipper2Lib {
     return result;
   }
 
+  // CleanPolygons: topology cleanup for polygons (eg output of boolean ops)
+  // that are otherwise unsuitable for downstream consumers (triangulation etc).
+  //   1. removes zero-length edges (duplicate consecutive vertices);
+  //   2. merges (near-)collinear vertices, where 'collinear_tolerance' is the
+  //      maximum perpendicular distance a vertex may deviate before it's kept
+  //      (0 = remove only exactly collinear vertices);
+  //   3. splits self-intersecting polygons into simple (non-self-intersecting)
+  //      polygons via a union operation.
+  // Each path is processed independently (so distinct paths are never merged),
+  // the filled region (non-zero fill rule) and its area are preserved exactly,
+  // and each path's winding (orientation) is preserved by re-orienting the
+  // union output to match the input path's orientation.
+  inline Paths64 CleanPolygons(const Paths64& paths,
+    double collinear_tolerance = 0.0)
+  {
+    Paths64 result;
+    for (Path64 path : paths) // (intentional copy)
+    {
+      StripDuplicates(path, true);
+      if (path.size() < 3) continue;
+      path = SimplifyPath(path, collinear_tolerance, true);
+      if (path.size() < 3) continue;
+      const bool is_negative = Area(path) < 0;
+      Paths64 parts = Union(Paths64{ path }, FillRule::NonZero);
+      for (auto& part : parts)
+      {
+        // the union can reintroduce duplicate / collinear vertices
+        StripDuplicates(part, true);
+        part = SimplifyPath(part, collinear_tolerance, true);
+        if (part.size() < 3) continue;
+        if (is_negative && Area(part) > 0)
+          std::reverse(part.begin(), part.end());
+        result.push_back(std::move(part));
+      }
+    }
+    return result;
+  }
+
+  inline PathsD CleanPolygons(const PathsD& paths,
+    double collinear_tolerance = 0.0, int precision = 2)
+  {
+    int error_code = 0;
+    CheckPrecisionRange(precision, error_code);
+    if (error_code) return PathsD();
+    PathsD result;
+    for (PathD path : paths) // (intentional copy)
+    {
+      StripDuplicates(path, true);
+      if (path.size() < 3) continue;
+      path = SimplifyPath(path, collinear_tolerance, true);
+      if (path.size() < 3) continue;
+      const bool is_negative = Area(path) < 0;
+      PathsD parts = Union(PathsD{ path }, FillRule::NonZero, precision);
+      for (auto& part : parts)
+      {
+        // the union can reintroduce duplicate / collinear vertices
+        StripDuplicates(part, true);
+        part = SimplifyPath(part, collinear_tolerance, true);
+        if (part.size() < 3) continue;
+        if (is_negative && Area(part) > 0)
+          std::reverse(part.begin(), part.end());
+        result.push_back(std::move(part));
+      }
+    }
+    return result;
+  }
+
+  inline Paths64 CleanPolygon(const Path64& path,
+    double collinear_tolerance = 0.0)
+  {
+    return CleanPolygons(Paths64{ path }, collinear_tolerance);
+  }
+
+  inline PathsD CleanPolygon(const PathD& path,
+    double collinear_tolerance = 0.0, int precision = 2)
+  {
+    return CleanPolygons(PathsD{ path }, collinear_tolerance, precision);
+  }
+
  
   template <typename T>
   inline bool Path2ContainsPath1(const Path<T>& path1, const Path<T>& path2)
